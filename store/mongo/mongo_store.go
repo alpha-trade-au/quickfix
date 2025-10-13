@@ -25,8 +25,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/quickfixgo/quickfix"
-	"github.com/quickfixgo/quickfix/config"
+	"github.com/alpha-trade-au/quickfix"
+	"github.com/alpha-trade-au/quickfix/config"
 )
 
 type mongoStoreFactory struct {

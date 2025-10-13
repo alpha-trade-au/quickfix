@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/quickfixgo/quickfix/config"
+	"github.com/alpha-trade-au/quickfix/config"
 )
 
 type TLSTestSuite struct {

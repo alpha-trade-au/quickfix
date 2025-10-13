@@ -23,7 +23,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/quickfixgo/quickfix"
+	"github.com/alpha-trade-au/quickfix"
 )
 
 func TestFileLog_NewFileLogFactory(t *testing.T) {

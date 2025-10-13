@@ -16,7 +16,7 @@
 package composite
 
 import (
-	"github.com/quickfixgo/quickfix"
+	"github.com/alpha-trade-au/quickfix"
 )
 
 type compositeLog struct {

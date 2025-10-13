@@ -1,4 +1,4 @@
-module github.com/quickfixgo/quickfix
+module github.com/alpha-trade-au/quickfix
 
 go 1.23
 

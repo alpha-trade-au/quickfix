@@ -23,8 +23,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/quickfixgo/quickfix"
-	"github.com/quickfixgo/quickfix/config"
+	"github.com/alpha-trade-au/quickfix"
+	"github.com/alpha-trade-au/quickfix/config"
 )
 
 const (

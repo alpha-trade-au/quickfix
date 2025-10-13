@@ -24,9 +24,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/quickfixgo/quickfix/config"
-	"github.com/quickfixgo/quickfix/datadictionary"
-	"github.com/quickfixgo/quickfix/internal"
+	"github.com/alpha-trade-au/quickfix/config"
+	"github.com/alpha-trade-au/quickfix/datadictionary"
+	"github.com/alpha-trade-au/quickfix/internal"
 )
 
 var dayLookup = map[string]time.Weekday{
