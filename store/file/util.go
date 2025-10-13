@@ -20,8 +20,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/alpha-trade-au/quickfix"
 	"github.com/pkg/errors"
-	"github.com/quickfixgo/quickfix"
 )
 
 func createFilenamePrefix(s quickfix.SessionID) string {

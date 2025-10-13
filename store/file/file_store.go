@@ -25,9 +25,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/alpha-trade-au/quickfix"
+	"github.com/alpha-trade-au/quickfix/config"
 	"github.com/pkg/errors"
-	"github.com/quickfixgo/quickfix"
-	"github.com/quickfixgo/quickfix/config"
 )
 
 type fileStoreFactory struct {

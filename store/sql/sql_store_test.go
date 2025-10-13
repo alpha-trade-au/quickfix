@@ -25,9 +25,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alpha-trade-au/quickfix"
+	"github.com/alpha-trade-au/quickfix/internal/testsuite"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/quickfixgo/quickfix"
-	"github.com/quickfixgo/quickfix/internal/testsuite"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )

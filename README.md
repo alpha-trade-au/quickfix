@@ -35,7 +35,7 @@ See v0.9.0 release notes [here](https://github.com/quickfixgo/quickfix/releases/
 With [Go module](https://github.com/golang/go/wiki/Modules) support, simply add the following import
 
 ```
-import "github.com/quickfixgo/quickfix"
+import "github.com/alpha-trade-au/quickfix"
 ```
 
 to your code, and then `go [build|run|test]` will automatically fetch the necessary dependencies.
@@ -43,7 +43,7 @@ to your code, and then `go [build|run|test]` will automatically fetch the necess
 Otherwise, run the following Go command to install the `quickfix` package:
 
 ```sh
-go get -u github.com/quickfixgo/quickfix
+go get -u github.com/alpha-trade-au/quickfix
 ```
 
 ## Getting Started

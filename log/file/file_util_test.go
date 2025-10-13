@@ -21,7 +21,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/quickfixgo/quickfix"
+	"github.com/alpha-trade-au/quickfix"
 	"github.com/stretchr/testify/require"
 )
 
