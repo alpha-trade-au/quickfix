@@ -68,6 +68,14 @@ func (sm *stateMachine) Connect(session *session) {
 	time.AfterFunc(session.LogonTimeout, func() { session.sessionEvent <- internal.LogonTimeout })
 }
 
+func (sm *stateMachine) Disconnect(session *session, reason string) {
+	if err := session.initiateLogout(reason); err != nil {
+		sm.setState(session, latentState{})
+	} else {
+		sm.setState(session, logoutState{})
+	}
+}
+
 func (sm *stateMachine) Stop(session *session) {
 	sm.pendingStop = true
 	sm.setState(session, sm.State.Stop(session))

@@ -423,6 +423,16 @@ func (f sessionFactory) newSession(
 		s.DisableMessagePersist = !persistMessages
 	}
 
+	s.OutgoingMsgBufferSize = 1000
+	if settings.HasSetting(config.OutgoingMsgBufferSize) {
+		var bufferSize int
+		if bufferSize, err = settings.IntSetting(config.OutgoingMsgBufferSize); err != nil {
+			return
+		}
+
+		s.OutgoingMsgBufferSize = bufferSize
+	}
+
 	if f.BuildInitiators {
 		if err = f.buildInitiatorSettings(s, settings); err != nil {
 			return
