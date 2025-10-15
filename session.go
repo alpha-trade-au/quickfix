@@ -287,7 +287,6 @@ func (s *session) checkBufferSize() error {
 	if len(s.toSend) < s.OutgoingMsgBufferSize {
 		return nil
 	}
-	s.dropQueued()
 	return ErrBufferFull
 }
 
@@ -614,6 +613,16 @@ func (s *session) initiateLogout(reason string) (err error) {
 
 func (s *session) initiateLogoutInReplyTo(reason string, inReplyTo *Message) (err error) {
 	if err = s.sendLogoutInReplyTo(reason, inReplyTo); err != nil {
+		s.logError(err)
+		return
+	}
+	s.log.OnEvent("Inititated logout request")
+	time.AfterFunc(s.LogoutTimeout, func() { s.sessionEvent <- internal.LogoutTimeout })
+	return
+}
+
+func (s *session) initiateImmediateLogout(reason string) (err error) {
+	if err = s.dropAndSend(s.buildLogout(reason)); err != nil {
 		s.logError(err)
 		return
 	}
