@@ -93,6 +93,16 @@ func (s *session) connect(msgIn <-chan fixIn, msgOut chan<- []byte) error {
 	return <-rep
 }
 
+type disconnect struct {
+	reason string
+}
+
+func (s *session) disconnect(reason string) {
+	s.admin <- disconnect{
+		reason: reason,
+	}
+}
+
 type stopReq struct{}
 
 func (s *session) stop() {
@@ -273,10 +283,21 @@ func (s *session) resend(msg *Message) bool {
 	return s.application.ToApp(msg, s.sessionID) == nil
 }
 
+func (s *session) checkBufferSize() error {
+	if len(s.toSend) < s.OutgoingMsgBufferSize {
+		return nil
+	}
+	return ErrBufferFull
+}
+
 // queueForSend will validate, persist, and queue the message for send.
 func (s *session) queueForSend(msg *Message) error {
 	s.sendMutex.Lock()
 	defer s.sendMutex.Unlock()
+
+	if err := s.checkBufferSize(); err != nil {
+		return err
+	}
 
 	msgBytes, err := s.prepMessageForSend(msg, nil)
 	if err != nil {
@@ -600,6 +621,16 @@ func (s *session) initiateLogoutInReplyTo(reason string, inReplyTo *Message) (er
 	return
 }
 
+func (s *session) initiateImmediateLogout(reason string) (err error) {
+	if err = s.dropAndSend(s.buildLogout(reason)); err != nil {
+		s.logError(err)
+		return
+	}
+	s.log.OnEvent("Inititated logout request")
+	time.AfterFunc(s.LogoutTimeout, func() { s.sessionEvent <- internal.LogoutTimeout })
+	return
+}
+
 func (s *session) verify(msg *Message) MessageRejectError {
 	return s.verifySelect(msg, true, true, true)
 }
@@ -858,6 +889,11 @@ func (s *session) onAdmin(msg interface{}) {
 		s.sentReset = false
 
 		s.Connect(s)
+
+	case disconnect:
+		if s.IsLoggedOn() {
+			s.Disconnect(s, msg.reason)
+		}
 
 	case stopReq:
 		s.Stop(s)

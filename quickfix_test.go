@@ -222,6 +222,7 @@ func (s *SessionSuiteRig) Init() {
 		sessionEvent: make(chan internal.Event),
 	}
 	s.MaxLatency = 120 * time.Second
+	s.OutgoingMsgBufferSize = 1000
 }
 
 func (s *SessionSuiteRig) State(state sessionState) {

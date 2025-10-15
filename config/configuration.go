@@ -1159,4 +1159,12 @@ const (
 	//  - Y
 	//  - N
 	EnableNextExpectedMsgSeqNum string = "EnableNextExpectedMsgSeqNum"
+
+	// Required: No
+	//
+	// Default: 1000
+	//
+	// Valid Values:
+	//  - A positive integer
+	OutgoingMsgBufferSize string = "OutgoingMsgBufferSize"
 )

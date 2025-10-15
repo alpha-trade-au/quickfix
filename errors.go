@@ -23,6 +23,8 @@ import (
 // ErrDoNotSend is a convenience error to indicate a DoNotSend in ToApp.
 var ErrDoNotSend = errors.New("Do Not Send")
 
+var ErrBufferFull = errors.New("message buffer is full")
+
 // rejectReason enum values.
 const (
 	rejectReasonInvalidTagNumber                          = 0

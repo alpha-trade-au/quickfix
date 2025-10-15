@@ -61,7 +61,12 @@ func SendToTarget(m Messagable, sessionID SessionID) error {
 		return errUnknownSession
 	}
 
-	return session.queueForSend(msg)
+	err := session.queueForSend(msg)
+	if errors.Is(err, ErrBufferFull) {
+		session.disconnect("unresponsive target")
+		return nil
+	}
+	return err
 }
 
 // ResetSession resets session's sequence numbers.
