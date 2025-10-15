@@ -430,6 +430,11 @@ func (f sessionFactory) newSession(
 			return
 		}
 
+		if bufferSize <= 0 {
+			err = errors.New("OutgoingMsgBufferSize must be a positive integer")
+			return
+		}
+
 		s.OutgoingMsgBufferSize = bufferSize
 	}
 
