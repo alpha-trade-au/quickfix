@@ -112,12 +112,29 @@ func (f RepeatingGroup) Get(i int) *Group {
 	return f.groups[i]
 }
 
+func (f *RepeatingGroup) Reset() {
+	f.groups = f.groups[:0]
+}
+
 // Add appends a new group to the RepeatingGroup and returns the new Group.
 func (f *RepeatingGroup) Add() *Group {
-	g := new(Group)
-	g.initWithOrdering(f.groupTagOrder())
+	n := len(f.groups)
+	if n == cap(f.groups) {
+		g := new(Group)
+		g.initWithOrdering(f.groupTagOrder())
+		f.groups = append(f.groups, g)
+		return g
+	}
 
-	f.groups = append(f.groups, g)
+	f.groups = f.groups[:n+1]
+	g := f.groups[n]
+	if g == nil {
+		g = new(Group)
+		g.initWithOrdering(f.groupTagOrder())
+		f.groups[n] = g
+	} else {
+		g.clearNoLock()
+	}
 	return g
 }
 
