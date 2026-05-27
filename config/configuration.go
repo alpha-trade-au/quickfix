@@ -1190,4 +1190,16 @@ const (
 	// Valid Values:
 	//  - A positive integer
 	OutgoingMsgBufferSize string = "OutgoingMsgBufferSize"
+
+	// SocketWriteTimeout bounds each individual socket write so that a slow or
+	// unresponsive peer surfaces as an error instead of blocking the
+	// session indefinitely.
+	//
+	// Required: No
+	//
+	// Default: 0 (no deadline)
+	//
+	// Valid Values:
+	//  - A valid go time.Duration
+	SocketWriteTimeout string = "WriteTimeout"
 )

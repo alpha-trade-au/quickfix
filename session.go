@@ -33,8 +33,9 @@ type session struct {
 	log       Log
 	sessionID SessionID
 
-	messageOut chan<- []byte
-	messageIn  <-chan fixIn
+	messageIn      <-chan fixIn
+	messageOut     chan<- []byte
+	messageOutDone <-chan struct{}
 
 	// Application messages are queued up for send here.
 	toSend [][]byte
@@ -77,19 +78,20 @@ func (s *session) TargetDefaultApplicationVersionID() string {
 }
 
 type connect struct {
-	messageOut chan<- []byte
-	messageIn  <-chan fixIn
-	err        chan<- error
+	messageOut     chan<- []byte
+	messageOutDone <-chan struct{}
+	messageIn      <-chan fixIn
+	err            chan<- error
 }
 
-func (s *session) connect(msgIn <-chan fixIn, msgOut chan<- []byte) error {
+func (s *session) connect(msgIn <-chan fixIn, msgOut chan<- []byte, msgOutDone <-chan struct{}) error {
 	rep := make(chan error)
 	s.admin <- connect{
-		messageOut: msgOut,
-		messageIn:  msgIn,
-		err:        rep,
+		messageOut:     msgOut,
+		messageOutDone: msgOutDone,
+		messageIn:      msgIn,
+		err:            rep,
 	}
-
 	return <-rep
 }
 
@@ -456,10 +458,15 @@ func (s *session) sendBytes(msg []byte, blockUntilSent bool) bool {
 	}
 
 	if blockUntilSent {
-		s.messageOut <- msg
-		s.log.OnOutgoing(msg)
-		s.stateTimer.Reset(s.HeartBtInt)
-		return true
+		select {
+		case s.messageOut <- msg:
+			s.log.OnOutgoing(msg)
+			s.stateTimer.Reset(s.HeartBtInt)
+			return true
+		case <-s.messageOutDone:
+			s.log.OnEvent("Failed to send: connection closed")
+			return false
+		}
 	}
 
 	select {
@@ -904,6 +911,7 @@ func (s *session) onAdmin(msg interface{}) {
 
 		s.messageIn = msg.messageIn
 		s.messageOut = msg.messageOut
+		s.messageOutDone = msg.messageOutDone
 		s.sentReset = false
 
 		s.Connect(s)

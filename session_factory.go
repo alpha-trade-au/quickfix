@@ -446,6 +446,21 @@ func (f sessionFactory) newSession(
 		s.OutgoingMsgBufferSize = bufferSize
 	}
 
+	if settings.HasSetting(config.SocketWriteTimeout) {
+		if s.SocketWriteTimeout, err = settings.DurationSetting(config.SocketWriteTimeout); err != nil {
+			var timeoutInt int
+			if timeoutInt, err = settings.IntSetting(config.SocketWriteTimeout); err != nil {
+				return
+			}
+			s.SocketWriteTimeout = time.Duration(timeoutInt) * time.Second
+		}
+
+		if s.SocketWriteTimeout < 0 {
+			err = errors.New("SocketWriteTimeout must not be negative")
+			return
+		}
+	}
+
 	if settings.HasSetting(config.InChanCapacity) {
 		if s.InChanCapacity, err = settings.IntSetting(config.InChanCapacity); err != nil {
 			return
@@ -476,7 +491,7 @@ func (f sessionFactory) newSession(
 
 	s.sessionEvent = make(chan internal.Event)
 	s.messageEvent = make(chan bool, 1)
-	s.admin = make(chan interface{})
+	s.admin = make(chan any, 10)
 	s.application = application
 	return
 }

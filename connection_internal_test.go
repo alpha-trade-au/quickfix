@@ -17,13 +17,29 @@ package quickfix
 
 import (
 	"bytes"
+	"net"
 	"strings"
 	"testing"
+	"time"
 )
 
+// bufferConn adapts a bytes.Buffer to net.Conn.
+type bufferConn struct {
+	bytes.Buffer
+}
+
+func (*bufferConn) Read([]byte) (int, error)         { return 0, nil }
+func (*bufferConn) Close() error                     { return nil }
+func (*bufferConn) LocalAddr() net.Addr              { return nil }
+func (*bufferConn) RemoteAddr() net.Addr             { return nil }
+func (*bufferConn) SetDeadline(time.Time) error      { return nil }
+func (*bufferConn) SetReadDeadline(time.Time) error  { return nil }
+func (*bufferConn) SetWriteDeadline(time.Time) error { return nil }
+
 func TestWriteLoop(t *testing.T) {
-	writer := bytes.NewBufferString("")
+	writer := &bufferConn{}
 	msgOut := make(chan []byte)
+	msgOutDone := make(chan struct{})
 
 	go func() {
 		msgOut <- []byte("test msg 1 ")
@@ -31,10 +47,15 @@ func TestWriteLoop(t *testing.T) {
 		msgOut <- []byte("test msg 3")
 		close(msgOut)
 	}()
-	writeLoop(writer, msgOut, nullLog{})
+	writeLoop(writer, msgOut, 0, msgOutDone, nullLog{})
+
+	select {
+	case <-msgOutDone:
+	default:
+		t.Error("expected msgOutDone channel to be closed")
+	}
 
 	expected := "test msg 1 test msg 2 test msg 3"
-
 	if writer.String() != expected {
 		t.Errorf("expected %v got %v", expected, writer.String())
 	}

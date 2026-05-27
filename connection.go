@@ -15,17 +15,26 @@
 
 package quickfix
 
-import "io"
+import (
+	"net"
+	"time"
+)
 
-func writeLoop(connection io.Writer, messageOut chan []byte, log Log) {
-	for {
-		msg, ok := <-messageOut
-		if !ok {
-			return
+// writeLoop closes done when it returns, signaling that the connection is
+// closed so a blocked sender can escape.
+func writeLoop(connection net.Conn, messageOut chan []byte, timeout time.Duration, done chan<- struct{}, log Log) {
+	defer close(done)
+
+	for msg := range messageOut {
+		if timeout > 0 {
+			if err := connection.SetWriteDeadline(time.Now().Add(timeout)); err != nil {
+				log.OnEvent(err.Error())
+				return
+			}
 		}
-
 		if _, err := connection.Write(msg); err != nil {
 			log.OnEvent(err.Error())
+			return
 		}
 	}
 }
